@@ -2,10 +2,12 @@ console.log("connected");
 // let keypadBtns = document.querySelectorAll(".keypad-button");
 let keypad = document.querySelector("#keypad");
 let timerDisplay = document.querySelector("#timer");
+let roundDisplay = document.querySelector("#round-text");
 
 //main variables
-let round = 4
-let sequenceCount = 0
+let round = 1;
+let roundsToWin = 5;
+let sequenceCount = 0;
 let pattern = [];
 let buttonCount = 4;
 let gameTime = 30;
@@ -75,9 +77,22 @@ function gameOver() {
 }
     
 function completeRound() {
-    setTimeout(()=>{alert(`You beat round: ${round}`)}, 500);
-    round++;
-    setTimeout(()=>{startRound(round)}, 600);
+    alert(`You beat round: ${round}`)
+    setTimeout(()=>{advanceToNextRound(round)}, 600);
+}
+
+function advanceToNextRound(roundNumber){
+    if (round == roundsToWin) {
+        alert('You survived');
+        pauseTimer();
+    } else {
+        round++;
+        console.log(`round complete, next round: ${round}`);
+        roundDisplay.textContent = `Round: ${round} of ${roundsToWin}`;
+        gameTime += 5;
+        timerDisplay.textContent = gameTime;
+        setTimeout(()=>{startRound(round)}, 600);
+    }
 }
     
 function buttonIsClicked(e){
@@ -88,7 +103,7 @@ function buttonIsClicked(e){
         setTimeout(()=> {e.target.style.backgroundColor = defaultButtonColor}, 500);
         sequenceCount++;
         if (sequenceCount >= pattern.length) {
-            completeRound();
+            setTimeout(()=>{advanceToNextRound(round)}, 600);
         }
     } else {
         e.target.style.backgroundColor = badButtonPressColor;
@@ -120,9 +135,10 @@ function setUpGame(){
 }
 function startGame() {
     round = 1;
+    roundDisplay.textContent = `Round: ${round} of ${roundsToWin}`;
     gameTime = 10;
     gameIsOver = false
-    startRound(round);
+    setTimeout(()=>{startRound(round)}, 1000);
     
 }
 
