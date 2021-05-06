@@ -23,12 +23,45 @@
 #keypad {
     height: 600px;
     width: 600px;
+    display: none;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+}
+#menu-screens {
+    height: 600px;
+    width: 600px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
     align-items: center;
 }
+#start-screen {
+    background-color: white;
+    width: 75%;
+    padding: 10px;
+    border: 1px black solid;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+#game-over-screen {
+    background-color: red;
+    width: 75%;
+    padding: 10px;
+    border: 1px black solid;
+    display: none;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
 
+.play-button {
+    width: 40%;
+}
+
+#reset-button {
+    width: 40%;
+}
 .keypad-button {
     /* width: 35%;
     height: 35%; */

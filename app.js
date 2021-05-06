@@ -1,12 +1,17 @@
 console.log("connected");
 // let keypadBtns = document.querySelectorAll(".keypad-button");
-let keypad = document.querySelector("#keypad");
-let timerDisplay = document.querySelector("#timer");
-let roundDisplay = document.querySelector("#round-text");
+let keypad = document.querySelector('#keypad');
+let timerDisplay = document.querySelector('#timer');
+let roundDisplay = document.querySelector('#round-text');
+let playBtns = document.querySelectorAll('.play-button');
+let startScreen = document.querySelector('#start-screen'); 
+let gameOverScreen = document.querySelector('#game-over-screen');
+let resetBtn = document.querySelector('#reset-button');
 
 //main variables
 let round = 1;
 let roundsToWin = 5;
+let timeAddedPerRound = 5;
 let sequenceCount = 0;
 let pattern = [];
 let buttonCount = 4;
@@ -29,7 +34,10 @@ function setUpButtons(buttonCount) {
         if (buttonCount <= 4) {
             newButton.style.width = "35%";
             newButton.style.height = "35%";
-        } 
+        } else {
+            newButton.style.width = "25%";
+            newButton.style.height = "25%";
+        }
         newButton.dataset.number = i
         newButton.addEventListener('click', buttonIsClicked);
         keypadBtns.push(newButton);
@@ -73,7 +81,15 @@ function displaySequence(sequence, element=0){
 function gameOver() {
     gameIsOver = true;
     pauseTimer();
-    setTimeout(()=>{alert("The Game is Over")}, 500);
+    setTimeout(displayGameOver, 500);
+}
+
+function displayGameOver(){
+    console.dir(keypad)
+    keypad.innerHTML = "";
+    keypadBtns = [];
+    keypad.style.display = "none";
+    gameOverScreen.style.display = "flex";
 }
     
 function completeRound() {
@@ -89,7 +105,7 @@ function advanceToNextRound(roundNumber){
         round++;
         console.log(`round complete, next round: ${round}`);
         roundDisplay.textContent = `Round: ${round} of ${roundsToWin}`;
-        gameTime += 5;
+        gameTime += timeAddedPerRound;
         timerDisplay.textContent = gameTime;
         setTimeout(()=>{startRound(round)}, 600);
     }
@@ -127,13 +143,31 @@ function updateTimer(){
         gameOver();
     }
 }
+function resetGame(){
+    gameOverScreen.style.display = "none";
+    startScreen.style.display = "flex";
+}
 
 //start game
 function setUpGame(){
-    setUpButtons(4);
+    keypad.style.display = "flex";
+    setUpButtons(buttonCount);
 
 }
-function startGame() {
+function startGame(e) {
+    console.dir(e);
+    startScreen.style.display = "none"
+    if (e.target.dataset.mode == "easy"){
+        buttonCount = 4;
+        timeAddedPerRound = 5;
+        roundsToWin = 5
+    } else {
+        buttonCount = 9;
+        timeAddedPerRound = 3;
+        roundsToWin = 10;
+    }
+    
+    setUpGame();
     round = 1;
     roundDisplay.textContent = `Round: ${round} of ${roundsToWin}`;
     gameTime = 10;
@@ -150,5 +184,9 @@ function startRound(roundNumber){
     displaySequence(pattern);
 }
     
-    setUpGame();
-    startGame();
+for (let i =0; i < playBtns.length; i++){
+    //console.log(playBtns);
+    playBtns[i].addEventListener("click", startGame);
+}
+resetBtn.addEventListener('click', resetGame);
+    //startGame();
