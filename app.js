@@ -7,6 +7,7 @@ let playBtns = document.querySelectorAll('.play-button');
 let startScreen = document.querySelector('#start-screen'); 
 let gameOverScreen = document.querySelector('#game-over-screen');
 let resetBtn = document.querySelector('#reset-button');
+let menuScreen = document.querySelector('#menu-screens');
 
 //main variables
 let round = 1;
@@ -19,10 +20,11 @@ let gameTime = 30;
 let keypadBtns = [];
 let gameIsOver = false;
 let gameTimer = null;
-let goodButtonPressColor = "green"
-let badButtonPressColor = "red"
-let displayButtonPressColor = "red"
-let defaultButtonColor = "gray"
+// let goodButtonPressColor = "green"
+// let badButtonPressColor = "red"
+// let displayButtonPressColor = "red"
+// let defaultButtonColor = "gray"
+let isDisplaying = true;
 
 //set up game
 //connect all keypad buttons
@@ -59,36 +61,37 @@ function generatePattern(patternCount, patternRange) {
     return pattern;
 }
 // highlight buttons to show sequence
-// function displayPattern(gamePattern) {
-//     for (let i = 0; i < gamePattern.length; i++){
-//         console.log(gamePattern[i]);
-//         setTimeout( () => {keypadBtns[gamePattern[i]].style.backgroundColor = displayButtonPressColor}, 500);
-//         setTimeout( () => {keypadBtns[gamePattern[i]].style.backgroundColor = defaultButtonColor}, 1000);
-//     }
-// }
-
 function displaySequence(sequence, element=0){
-    keypadBtns[sequence[element]].style.backgroundColor = displayButtonPressColor
-    setTimeout( () => {keypadBtns[sequence[element]].style.backgroundColor = defaultButtonColor}, 800);
+    // keypadBtns[sequence[element]].style.backgroundColor = displayButtonPressColor
+    keypadBtns[sequence[element]].classList.toggle("highlight");
+    isDisplaying = true;
+    // setTimeout( () => {keypadBtns[sequence[element]].style.backgroundColor = defaultButtonColor}, 800);
+    setTimeout( () => {keypadBtns[sequence[element]].classList.toggle("highlight")}, 800);
     if (element + 1 < sequence.length) {
         setTimeout(() => {displaySequence(sequence, element +1)}, 1000);
     } else {
         //sequence done displaying
-        startTimer();
+        setTimeout(()=>{
+            isDisplaying = false;
+            startTimer();
+        }, 500);
     }
 }
-    
+
+//set the game over conditions and then display the game over screen.
 function gameOver() {
     gameIsOver = true;
     pauseTimer();
     setTimeout(displayGameOver, 500);
 }
 
+//remove the keypad buttons and make the game over screen visible
 function displayGameOver(){
     console.dir(keypad)
     keypad.innerHTML = "";
     keypadBtns = [];
     keypad.style.display = "none";
+    menuScreen.style.display = "flex";
     gameOverScreen.style.display = "flex";
 }
     
@@ -113,19 +116,24 @@ function advanceToNextRound(roundNumber){
     
 function buttonIsClicked(e){
     console.log(e.target.dataset.number);
-    if (e.target.dataset.number == pattern[sequenceCount]){
-        // keep playing
-        e.target.style.backgroundColor = goodButtonPressColor;
-        setTimeout(()=> {e.target.style.backgroundColor = defaultButtonColor}, 500);
-        sequenceCount++;
-        if (sequenceCount >= pattern.length) {
-            setTimeout(()=>{advanceToNextRound(round)}, 600);
+    if (!isDisplaying) {
+
+        if (e.target.dataset.number == pattern[sequenceCount]){
+            // keep playing
+            // e.target.style.backgroundColor = goodButtonPressColor;
+            e.target.classList.toggle("highlight");
+            setTimeout(()=> {e.target.classList.toggle("highlight")}, 500);
+            sequenceCount++;
+            if (sequenceCount >= pattern.length) {
+                setTimeout(()=>{advanceToNextRound(round)}, 600);
+            }
+        } else {
+            // e.target.style.backgroundColor = badButtonPressColor;
+            e.target.classList.toggle("wrong");
+            gameOver();
         }
-    } else {
-        e.target.style.backgroundColor = badButtonPressColor;
-        gameOver();
     }
-    
+        
 }
 
 //timer
@@ -143,8 +151,16 @@ function updateTimer(){
         gameOver();
     }
 }
+
+function updateTimeDisplay(time){
+    let seconds = Math.floor(time % 60).toString();
+    let minutes = Math.floor(time / 60).toString();
+    let gameTimeString = 
+    timerDisplay.textContent = gameTimeString
+}
 function resetGame(){
     gameOverScreen.style.display = "none";
+    menuScreen.style.display = "flex";
     startScreen.style.display = "flex";
 }
 
@@ -156,7 +172,8 @@ function setUpGame(){
 }
 function startGame(e) {
     console.dir(e);
-    startScreen.style.display = "none"
+    startScreen.style.display = "none";
+    menuScreen.style.display = "none";
     if (e.target.dataset.mode == "easy"){
         buttonCount = 4;
         timeAddedPerRound = 5;

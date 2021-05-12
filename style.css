@@ -11,6 +11,12 @@
     background-color: lightgray;
     width: 600px;
     margin: 0 auto;
+    border-radius: 5px;
+    box-shadow: 0 20px 0 0 darkgray,
+                0 0 0 2px rgba(220,220,220,0.8) inset,
+                0 20px 0 1px black,
+                0 20px 20px 1px rgba(0,0,0,0.5);
+
 }
 
 #time-display{
@@ -27,6 +33,7 @@
     flex-wrap: wrap;
     justify-content: space-around;
     align-items: center;
+    
 }
 #menu-screens {
     height: 600px;
@@ -63,15 +70,43 @@
     width: 40%;
 }
 .keypad-button {
-    /* width: 35%;
-    height: 35%; */
+    width: 100px;
+    height: 100px;
+    position: relative;
     display: flex;
-    border: 2px solid black;
     border-radius: 10px;
     margin: 20px;
-    background-color: gray;
+    background-color: rgb(250, 250, 250);
     font-size: xxx-large;
     justify-content: center;
     align-items: center;
-    color: white;
+    color: gray;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.5);;
+    box-shadow: 0 10px 0 0 rgb(230,230,230),
+                0 0 0 2px rgba(210,210,210,0.8) inset,
+                0 10px 0 1px black,
+                0 10px 5px 1px rgba(0,0,0,0.5);
+}
+
+.keypad-button:active {
+    top: 10px;
+    box-shadow: 0 0 0 2px rgba(210,210,210,0.8) inset,
+                0 1px 0 1px black;
+}
+
+.keypad-button.highlight {
+    background-color: lime;
+    color: rgba(30, 211, 54, 0.8);
+    box-shadow: 0 10px 0 0 rgb(35, 151, 25),
+                0 0 0 2px rgba(127, 255, 116, 0.8) inset,
+                0 10px 0 1px black,
+                0 10px 10px 5px rgba(20, 180, 15, 0.8);
+}
+.keypad-button.wrong {
+    background-color: rgb(250, 33, 17);
+    color: rgba(107, 5, 13, 0.8);
+    box-shadow: 0 10px 0 0 rgb(148, 21, 5),
+                0 0 0 2px rgba(240, 98, 79, 0.8) inset,
+                0 10px 0 1px black,
+                0 10px 10px 5px rgba(226, 34, 0, 0.8);
 }
