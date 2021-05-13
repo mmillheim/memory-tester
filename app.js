@@ -6,7 +6,8 @@ let roundDisplay = document.querySelector('#round-text');
 let playBtns = document.querySelectorAll('.play-button');
 let startScreen = document.querySelector('#start-screen'); 
 let gameOverScreen = document.querySelector('#game-over-screen');
-let resetBtn = document.querySelector('#reset-button');
+let victoryScreen = document.querySelector('#victory-screen');
+let resetBtns = document.querySelectorAll('.reset-button');
 let menuScreen = document.querySelector('#menu-screens');
 
 //main variables
@@ -25,6 +26,7 @@ let gameTimer = null;
 // let displayButtonPressColor = "red"
 // let defaultButtonColor = "gray"
 let isDisplaying = true;
+let nextRoundMessage = ["OK", "PASS", "MEH", "TICK TICK", "PFFT", "*SIGH*"];
 
 //set up game
 //connect all keypad buttons
@@ -82,12 +84,13 @@ function displaySequence(sequence, element=0){
 function gameOver() {
     gameIsOver = true;
     pauseTimer();
+    timerDisplay.textContent = "BOOM";
     setTimeout(displayGameOver, 500);
 }
 
 //remove the keypad buttons and make the game over screen visible
 function displayGameOver(){
-    console.dir(keypad)
+    console.dir(keypad);
     keypad.innerHTML = "";
     keypadBtns = [];
     keypad.style.display = "none";
@@ -95,25 +98,27 @@ function displayGameOver(){
     gameOverScreen.style.display = "flex";
 }
     
-function completeRound() {
-    alert(`You beat round: ${round}`)
-    setTimeout(()=>{advanceToNextRound(round)}, 600);
+function advanceToNextRound(roundNumber){
+    round++;
+    console.log(`round complete, next round: ${round}`);
+    roundDisplay.textContent = `Round: ${round} of ${roundsToWin}`;
+    gameTime += timeAddedPerRound;
+    // timerDisplay.textContent = gameTime;
+    updateTimeDisplay(gameTime);
+    setTimeout(()=>{startRound(round)}, 600);
 }
 
-function advanceToNextRound(roundNumber){
-    if (round == roundsToWin) {
-        alert('You survived');
-        pauseTimer();
-    } else {
-        round++;
-        console.log(`round complete, next round: ${round}`);
-        roundDisplay.textContent = `Round: ${round} of ${roundsToWin}`;
-        gameTime += timeAddedPerRound;
-        timerDisplay.textContent = gameTime;
-        setTimeout(()=>{startRound(round)}, 600);
-    }
+function displayVictory(){
+    pauseTimer();
+    timerDisplay.textContent = "DISARMED";
+    keypad.innerHTML = "";
+    keypadBtns = [];
+    keypad.style.display = "none";
+    menuScreen.style.display = "flex";
+    victoryScreen.style.display = "flex";
+
 }
-    
+
 function buttonIsClicked(e){
     console.log(e.target.dataset.number);
     if (!isDisplaying) {
@@ -125,7 +130,13 @@ function buttonIsClicked(e){
             setTimeout(()=> {e.target.classList.toggle("highlight")}, 500);
             sequenceCount++;
             if (sequenceCount >= pattern.length) {
-                setTimeout(()=>{advanceToNextRound(round)}, 600);
+                if (round == roundsToWin) {
+                    displayVictory();
+                } else {
+                    pauseTimer();
+                    timerDisplay.textContent = nextRoundMessage[Math.floor(Math.random()*nextRoundMessage.length)];
+                    setTimeout(()=>{advanceToNextRound(round)}, 600);
+                }
             }
         } else {
             // e.target.style.backgroundColor = badButtonPressColor;
@@ -146,20 +157,22 @@ function pauseTimer(){
 }
 function updateTimer(){
     gameTime--;
-    timerDisplay.textContent = gameTime;
+    //timerDisplay.textContent = gameTime;
+    updateTimeDisplay(gameTime);
     if (gameTime <= 0){
         gameOver();
     }
 }
 
 function updateTimeDisplay(time){
-    let seconds = Math.floor(time % 60).toString();
-    let minutes = Math.floor(time / 60).toString();
-    let gameTimeString = 
+    let seconds = Math.floor(time % 60);
+    let minutes = Math.floor(time / 60);
+    let gameTimeString =  (minutes < 10 ? "0" + minutes : minutes.toString()) + ":" + (seconds < 10 ? "0" + seconds : seconds.toString());
     timerDisplay.textContent = gameTimeString
 }
 function resetGame(){
     gameOverScreen.style.display = "none";
+    victoryScreen.style.display = "none";
     menuScreen.style.display = "flex";
     startScreen.style.display = "flex";
 }
@@ -188,6 +201,7 @@ function startGame(e) {
     round = 1;
     roundDisplay.textContent = `Round: ${round} of ${roundsToWin}`;
     gameTime = 10;
+    updateTimeDisplay(gameTime);
     gameIsOver = false
     setTimeout(()=>{startRound(round)}, 1000);
     
@@ -195,9 +209,12 @@ function startGame(e) {
 
 function startRound(roundNumber){
     pattern = generatePattern(roundNumber, buttonCount);
+    //pattern = generatePattern(1, buttonCount);
     //displayPattern(pattern);
+    //updateTimeDisplay(gameTime);
     sequenceCount = 0;
     pauseTimer();
+    timerDisplay.textContent = "PATTERN"
     displaySequence(pattern);
 }
     
@@ -205,5 +222,7 @@ for (let i =0; i < playBtns.length; i++){
     //console.log(playBtns);
     playBtns[i].addEventListener("click", startGame);
 }
-resetBtn.addEventListener('click', resetGame);
+for (let i =0; i < resetBtns.length; i++){
+    resetBtns[i].addEventListener('click', resetGame);
+}
     //startGame();
