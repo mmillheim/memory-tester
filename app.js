@@ -1,4 +1,4 @@
-console.log("connected");
+//console.log("connected");
 // let keypadBtns = document.querySelectorAll(".keypad-button");
 let keypad = document.querySelector('#keypad');
 let timerDisplay = document.querySelector('#timer');
@@ -28,8 +28,9 @@ let gameTimer = null;
 let isDisplaying = true;
 let nextRoundMessage = ["OK", "PASS", "MEH", "TICK TICK", "PFFT", "*SIGH*"];
 
-//set up game
-//connect all keypad buttons
+//--- Game UI -------------------------------------------------------------
+
+//create and connect all keypad buttons
 function setUpButtons(buttonCount) {
     for(let i = 0; i < buttonCount; i++){
         let newButton = document.createElement('div');
@@ -52,6 +53,21 @@ function setUpButtons(buttonCount) {
         // keypadBtns[i].addEventListener('click', ()=>{console.log(buttonNumber)});
     }
 }
+
+// setup the inital UI so user can start or reset the game
+function setupUI(){
+    for (let i =0; i < playBtns.length; i++){
+        //console.log(playBtns);
+        playBtns[i].addEventListener("click", startGame);
+    }
+    for (let i =0; i < resetBtns.length; i++){
+        resetBtns[i].addEventListener('click', resetGame);
+    }
+}
+
+//--- Game Logic -------------------------------------------------------------
+
+
 //create pattern for user
 function generatePattern(patternCount, patternRange) {
     let pattern = []
@@ -59,9 +75,11 @@ function generatePattern(patternCount, patternRange) {
         let randomNumber = Math.floor(Math.random()*patternRange)
         pattern.push(randomNumber);
     }
-    console.log(pattern);
+    //console.log(pattern);
     return pattern;
 }
+
+
 // highlight buttons to show sequence
 function displaySequence(sequence, element=0){
     // keypadBtns[sequence[element]].style.backgroundColor = displayButtonPressColor
@@ -80,27 +98,11 @@ function displaySequence(sequence, element=0){
     }
 }
 
-//set the game over conditions and then display the game over screen.
-function gameOver() {
-    gameIsOver = true;
-    pauseTimer();
-    timerDisplay.textContent = "BOOM";
-    setTimeout(displayGameOver, 500);
-}
 
-//remove the keypad buttons and make the game over screen visible
-function displayGameOver(){
-    console.dir(keypad);
-    keypad.innerHTML = "";
-    keypadBtns = [];
-    keypad.style.display = "none";
-    menuScreen.style.display = "flex";
-    gameOverScreen.style.display = "flex";
-}
-    
+// update the round and then trigger the next round to start
 function advanceToNextRound(roundNumber){
     round++;
-    console.log(`round complete, next round: ${round}`);
+    //console.log(`round complete, next round: ${round}`);
     roundDisplay.textContent = `Round: ${round} of ${roundsToWin}`;
     gameTime += timeAddedPerRound;
     // timerDisplay.textContent = gameTime;
@@ -108,21 +110,11 @@ function advanceToNextRound(roundNumber){
     setTimeout(()=>{startRound(round)}, 600);
 }
 
-function displayVictory(){
-    pauseTimer();
-    timerDisplay.textContent = "DISARMED";
-    keypad.innerHTML = "";
-    keypadBtns = [];
-    keypad.style.display = "none";
-    menuScreen.style.display = "flex";
-    victoryScreen.style.display = "flex";
-
-}
-
+// When a button is clicked, if correct, advance in sequence or round; if incorrect, game over.
 function buttonIsClicked(e){
-    console.log(e.target.dataset.number);
+    //console.log(e.target.dataset.number);
     if (!isDisplaying) {
-
+        
         if (e.target.dataset.number == pattern[sequenceCount]){
             // keep playing
             // e.target.style.backgroundColor = goodButtonPressColor;
@@ -144,17 +136,67 @@ function buttonIsClicked(e){
             gameOver();
         }
     }
-        
+    
 }
 
-//timer
+
+function startRound(roundNumber){
+    pattern = generatePattern(roundNumber, buttonCount);
+    //pattern = generatePattern(1, buttonCount);
+    //displayPattern(pattern);
+    //updateTimeDisplay(gameTime);
+    sequenceCount = 0;
+    pauseTimer();
+    timerDisplay.textContent = "PATTERN"
+    displaySequence(pattern);
+}
+
+//--- Game Over and Victory Displays -------------------------------------------------------------
+
+//set the game over conditions and then display the game over screen.
+function gameOver() {
+    gameIsOver = true;
+    pauseTimer();
+    timerDisplay.textContent = "BOOM";
+    setTimeout(displayGameOver, 500);
+}
+
+//remove the keypad buttons and make the game over screen visible
+function displayGameOver(){
+    //console.dir(keypad);
+    keypad.innerHTML = "";
+    keypadBtns = [];
+    keypad.style.display = "none";
+    menuScreen.style.display = "flex";
+    gameOverScreen.style.display = "flex";
+}
+
+
+function displayVictory(){
+    pauseTimer();
+    timerDisplay.textContent = "DISARMED";
+    keypad.innerHTML = "";
+    keypadBtns = [];
+    keypad.style.display = "none";
+    menuScreen.style.display = "flex";
+    victoryScreen.style.display = "flex";
+    
+}
+
+
+//--- Timer -------------------------------------------------------------
+
+//start timer
 function startTimer() {
     gameTimer = setInterval(updateTimer, 1000);
 }
 
+// pause timer (used while displaying pattern and between rounds)
 function pauseTimer(){
     clearInterval(gameTimer);
 }
+
+// advance the timer and check if time is up
 function updateTimer(){
     gameTime--;
     //timerDisplay.textContent = gameTime;
@@ -164,12 +206,17 @@ function updateTimer(){
     }
 }
 
+// format the time display on the timer
 function updateTimeDisplay(time){
     let seconds = Math.floor(time % 60);
     let minutes = Math.floor(time / 60);
     let gameTimeString =  (minutes < 10 ? "0" + minutes : minutes.toString()) + ":" + (seconds < 10 ? "0" + seconds : seconds.toString());
     timerDisplay.textContent = gameTimeString
 }
+
+//--- Start, Reset, Setup Game -------------------------------------------------------------
+
+// reset the UI and the game
 function resetGame(){
     gameOverScreen.style.display = "none";
     victoryScreen.style.display = "none";
@@ -181,10 +228,10 @@ function resetGame(){
 function setUpGame(){
     keypad.style.display = "flex";
     setUpButtons(buttonCount);
-
+    
 }
 function startGame(e) {
-    console.dir(e);
+    //console.dir(e);
     startScreen.style.display = "none";
     menuScreen.style.display = "none";
     if (e.target.dataset.mode == "easy"){
@@ -207,22 +254,7 @@ function startGame(e) {
     
 }
 
-function startRound(roundNumber){
-    pattern = generatePattern(roundNumber, buttonCount);
-    //pattern = generatePattern(1, buttonCount);
-    //displayPattern(pattern);
-    //updateTimeDisplay(gameTime);
-    sequenceCount = 0;
-    pauseTimer();
-    timerDisplay.textContent = "PATTERN"
-    displaySequence(pattern);
-}
-    
-for (let i =0; i < playBtns.length; i++){
-    //console.log(playBtns);
-    playBtns[i].addEventListener("click", startGame);
-}
-for (let i =0; i < resetBtns.length; i++){
-    resetBtns[i].addEventListener('click', resetGame);
-}
-    //startGame();
+
+
+//--- Call the initial UI Setup Function -------------------------------------------------------------
+setupUI();
